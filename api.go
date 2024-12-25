@@ -379,6 +379,89 @@ func (z createzone) destroy() (*resty.Response, error) {
 	return apireq(path, rm)
 }
 
+type dnssec struct {
+	Authid       int    `json:"auth-id,omitempty"`
+	Subauthid    int    `json:"sub-auth-id,omitempty"`
+	Authpassword string `json:"auth-password"`
+	Domain       string `json:"domain-name"`
+}
+
+func (z dnssec) eligible() (*resty.Response, error) {
+	const path = "/dns/is-dnssec-available.json"
+	pl := dnssec{
+		Authid:       z.Authid,
+		Subauthid:    z.Subauthid,
+		Authpassword: z.Authpassword,
+		Domain:       z.Domain,
+	}
+	return apireq(path, pl)
+}
+
+func (z dnssec) read() (*resty.Response, error) {
+	const path = "/dns/get-dnssec-ds-records.json"
+	pl := dnssec{
+		Authid:       z.Authid,
+		Subauthid:    z.Subauthid,
+		Authpassword: z.Authpassword,
+		Domain:       z.Domain,
+	}
+	return apireq(path, pl)
+}
+
+func (z dnssec) activate() (*resty.Response, error) {
+	const path = "/dns/activate-dnssec.json"
+	pl := dnssec{
+		Authid:       z.Authid,
+		Subauthid:    z.Subauthid,
+		Authpassword: z.Authpassword,
+		Domain:       z.Domain,
+	}
+	return apireq(path, pl)
+}
+
+func (z dnssec) deactivate() (*resty.Response, error) {
+	const path = "/dns/deactivate-dnssec.json"
+	pl := dnssec{
+		Authid:       z.Authid,
+		Subauthid:    z.Subauthid,
+		Authpassword: z.Authpassword,
+		Domain:       z.Domain,
+	}
+	return apireq(path, pl)
+}
+
+type optout struct {
+	Authid       int    `json:"auth-id,omitempty"`
+	Subauthid    int    `json:"sub-auth-id,omitempty"`
+	Authpassword string `json:"auth-password"`
+	Domain       string `json:"domain-name"`
+	Status       int    `json:"status"`
+}
+
+func (z optout) enable() (*resty.Response, error) {
+	const path = "/dns/set-dnssec-optout.json"
+	pl := optout{
+		Authid:       z.Authid,
+		Subauthid:    z.Subauthid,
+		Authpassword: z.Authpassword,
+		Domain:       z.Domain,
+		Status:       1,
+	}
+	return apireq(path, pl)
+}
+
+func (z optout) disable() (*resty.Response, error) {
+	const path = "/dns/set-dnssec-optout.json"
+	pl := optout{
+		Authid:       z.Authid,
+		Subauthid:    z.Subauthid,
+		Authpassword: z.Authpassword,
+		Domain:       z.Domain,
+		Status:       0,
+	}
+	return apireq(path, pl)
+}
+
 type CheckSettings struct {
 	LatencyLimit    string     `json:"latency_limit,omitempty"`
 	Timeout         string     `json:"timeout,omitempty"`

@@ -344,6 +344,134 @@ func (z Zone) Destroy(a *Apiaccess) (Zone, error) {
 	return z, err
 }
 
+// Dnssec is the external representation of a zone's DNSSEC settings
+// check the ...dnssec types in api.go for details
+type Dnssec struct {
+	Domain     string `json:"domain-name"`
+	Enabled    int    `json:"enabled"`
+	Optout     int    `json:"optout"`
+	KeyTag     string `json:"keytag,omitempty"`
+	Algorithm  string `json:"algorithm,omitempty"`
+	DigestType string `json:"digest_type,omitempty"`
+	Digest     string `json:"digest,omitempty"`
+}
+
+// Is zone DNSSEC eligable
+func (d Dnssec) Eligible(a *Apiaccess) (bool, error) {
+	ds := dnssec{
+		Authid:       a.Authid,
+		Subauthid:    a.Subauthid,
+		Authpassword: a.Authpassword,
+		Domain:       d.Domain,
+	}
+	resp, err := ds.eligible()
+	if err != nil {
+		return false, err
+	}
+	errmsg, isapierr := checkapierr(resp.Body())
+	if isapierr {
+		return false, errors.New(errmsg)
+	}
+	return true, nil
+}
+
+// Activate zone DNSSEC
+func (d Dnssec) Activate(a *Apiaccess) (bool, error) {
+	ds := dnssec{
+		Authid:       a.Authid,
+		Subauthid:    a.Subauthid,
+		Authpassword: a.Authpassword,
+		Domain:       d.Domain,
+	}
+	resp, err := ds.activate()
+	if err != nil {
+		return false, err
+	}
+	errmsg, isapierr := checkapierr(resp.Body())
+	if isapierr {
+		return false, errors.New(errmsg)
+	}
+	return true, nil
+}
+
+// Activate zone DNSSEC
+func (d Dnssec) Read(a *Apiaccess) (bool, error) {
+	ds := dnssec{
+		Authid:       a.Authid,
+		Subauthid:    a.Subauthid,
+		Authpassword: a.Authpassword,
+		Domain:       d.Domain,
+	}
+	resp, err := ds.read()
+	if err != nil {
+		return false, err
+	}
+	errmsg, isapierr := checkapierr(resp.Body())
+	if isapierr {
+		return false, errors.New(errmsg)
+	}
+	return true, nil
+}
+
+// Deactivate zone DNSSEC
+func (d Dnssec) Deactivate(a *Apiaccess) (bool, error) {
+	ds := dnssec{
+		Authid:       a.Authid,
+		Subauthid:    a.Subauthid,
+		Authpassword: a.Authpassword,
+		Domain:       d.Domain,
+	}
+	resp, err := ds.deactivate()
+	if err != nil {
+		return false, err
+	}
+	errmsg, isapierr := checkapierr(resp.Body())
+	if isapierr {
+		return false, errors.New(errmsg)
+	}
+	return true, nil
+}
+
+// Enable DNSSEC opt-out
+func (d Dnssec) OptoutEnable(a *Apiaccess) (bool, error) {
+	oo := optout{
+		Authid:       a.Authid,
+		Subauthid:    a.Subauthid,
+		Authpassword: a.Authpassword,
+		Domain:       d.Domain,
+		Status:       1,
+	}
+	resp, err := oo.enable()
+	if err != nil {
+		return false, err
+	}
+	errmsg, isapierr := checkapierr(resp.Body())
+	if isapierr {
+		return false, errors.New(errmsg)
+	}
+	return true, nil
+}
+
+// Disable DNSSEC opt-out
+func (d Dnssec) OptoutDisable(a *Apiaccess) (bool, error) {
+	oo := optout{
+		Authid:       a.Authid,
+		Subauthid:    a.Subauthid,
+		Authpassword: a.Authpassword,
+		Domain:       d.Domain,
+		Status:       0,
+	}
+	resp, err := oo.disable()
+	if err != nil {
+		return false, err
+	}
+	errmsg, isapierr := checkapierr(resp.Body())
+	if isapierr {
+		return false, errors.New(errmsg)
+	}
+	return true, nil
+}
+
 // Record is the external representation of a record
 // check the ...record types in api.go for details
 type Record struct {
